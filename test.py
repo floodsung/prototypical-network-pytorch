@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 
 from mini_imagenet import MiniImageNet
 from samplers import CategoriesSampler
-from convnet import Convnet
+from senet import EmbeddingSENet,SEBasicBlock
 from utils import pprint, set_gpu, count_acc, Averager, euclidean_metric
 
 
@@ -14,14 +14,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', default='0')
     parser.add_argument('--load', default='./save/proto-1/max-acc.pth')
-    parser.add_argument('--batch', type=int, default=2000)
+    parser.add_argument('--batch', type=int, default=600)
     parser.add_argument('--way', type=int, default=5)
     parser.add_argument('--shot', type=int, default=1)
-    parser.add_argument('--query', type=int, default=30)
+    parser.add_argument('--query', type=int, default=15)
     args = parser.parse_args()
     pprint(vars(args))
 
-    set_gpu(args.gpu)
+    device = torch.device('cuda:' + str(args.gpu) if torch.cuda.is_available() else 'cpu')
 
     dataset = MiniImageNet('test')
     sampler = CategoriesSampler(dataset.label,
@@ -29,14 +29,15 @@ if __name__ == '__main__':
     loader = DataLoader(dataset, batch_sampler=sampler,
                         num_workers=8, pin_memory=True)
 
-    model = Convnet().cuda()
+    model = EmbeddingSENet(SEBasicBlock,[3, 4, 6, 3],with_variation=True).to(device)
+
     model.load_state_dict(torch.load(args.load))
     model.eval()
 
     ave_acc = Averager()
 
     for i, batch in enumerate(loader, 1):
-        data, _ = [_.cuda() for _ in batch]
+        data, _ = [_.to(device) for _ in batch]
         k = args.way * args.shot
         data_shot, data_query = data[:k], data[k:]
 
