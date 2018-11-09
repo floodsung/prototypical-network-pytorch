@@ -69,7 +69,7 @@ if __name__ == '__main__':
             proto = proto.reshape(args.shot, args.train_way, -1).mean(dim=0)
 
             label = torch.arange(args.train_way).repeat(args.query)
-            label = label.type(torch.cuda.LongTensor)
+            label = label.to(device)
 
             logits = euclidean_metric(model(data_query), proto)
             loss = F.cross_entropy(logits, label)
