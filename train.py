@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
 
     trainset = MiniImageNet('train_val')
-    train_sampler = CategoriesSampler(trainset.label, 100,
+    train_sampler = CategoriesSampler(trainset.label, 200,
                                       args.train_way, args.shot + args.query)
     train_loader = DataLoader(dataset=trainset, batch_sampler=train_sampler,
                               num_workers=8, pin_memory=True)
