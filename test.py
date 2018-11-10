@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     device = torch.device('cuda:' + str(args.gpu) if torch.cuda.is_available() else 'cpu')
 
-    dataset = MiniImageNet('test')
+    dataset = MiniImageNet('test',is_train=False)
     sampler = CategoriesSampler(dataset.label,
                                 args.batch, args.way, args.shot + args.query)
     loader = DataLoader(dataset, batch_sampler=sampler,
