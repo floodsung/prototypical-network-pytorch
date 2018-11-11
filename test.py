@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
         acc = count_acc(logits, label)
         ave_acc.add(acc)
-        accuracies.appen(acc)
+        accuracies.append(acc)
         print('batch {}: {:.2f}({:.2f})'.format(i, ave_acc.item() * 100, acc * 100))
 
     m,h = mean_confidence_interval(accuracies)
