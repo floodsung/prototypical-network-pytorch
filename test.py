@@ -9,6 +9,12 @@ from samplers import CategoriesSampler
 from senet import EmbeddingSENet,SEBasicBlock
 from utils import pprint, set_gpu, count_acc, Averager, euclidean_metric
 
+def mean_confidence_interval(data, confidence=0.95):
+    a = 1.0*np.array(data)
+    n = len(a)
+    m, se = np.mean(a), scipy.stats.sem(a)
+    h = se * sp.stats.t._ppf((1+confidence)/2., n-1)
+    return m, h
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -35,6 +41,7 @@ if __name__ == '__main__':
     model.eval()
 
     ave_acc = Averager()
+    accuracies = []
 
     for i, batch in enumerate(loader, 1):
         data, _ = [_.to(device) for _ in batch]
@@ -52,5 +59,8 @@ if __name__ == '__main__':
 
         acc = count_acc(logits, label)
         ave_acc.add(acc)
+        accuracies.appen(acc)
         print('batch {}: {:.2f}({:.2f})'.format(i, ave_acc.item() * 100, acc * 100))
 
+    m,h = mean_confidence_interval(accuracies)
+    print("mean:",m,"h:",h)
