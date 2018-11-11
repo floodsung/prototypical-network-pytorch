@@ -8,6 +8,9 @@ from mini_imagenet import MiniImageNet
 from samplers import CategoriesSampler
 from senet import EmbeddingSENet,SEBasicBlock
 from utils import pprint, set_gpu, count_acc, Averager, euclidean_metric
+import numpy as np
+import scipy as sp
+import scipy.stats
 
 def mean_confidence_interval(data, confidence=0.95):
     a = 1.0*np.array(data)
