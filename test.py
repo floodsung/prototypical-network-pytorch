@@ -55,7 +55,7 @@ if __name__ == '__main__':
         logits = euclidean_metric(model(data_query), p)
 
         label = torch.arange(args.way).repeat(args.query)
-        label = label.type(torch.cuda.LongTensor)
+        label = label.to(device)
 
         acc = count_acc(logits, label)
         ave_acc.add(acc)
