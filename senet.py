@@ -92,7 +92,10 @@ class EmbeddingSENet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        self.avgpool = nn.AvgPool2d(4, padding=1)
+        self.avgpool1 = nn.AvgPool2d(56)
+        self.avgpool2 = nn.AvgPool2d(28)
+        self.avgpool3 = nn.AvgPool2d(14)
+        self.avgpool4 = nn.AvgPool2d(7)
         self.expansion = block.expansion
 
 
@@ -120,6 +123,7 @@ class EmbeddingSENet(nn.Module):
             feature1_std = torch.sigmoid(feature1_std)
             feature1_std_ext = feature1_std.repeat(1,split_size[0],1,1)
             feature1 = feature1_mean + feature1_std_ext*torch.randn(feature1_mean.size(),device=feature1.get_device())
+            feature1_avg = self.avgpool1(feature1)
 
             feature2 = self.layer2(feature1) #[expansion*128+1,28,28]
             split_size = [self.expansion*128,1]
@@ -127,6 +131,7 @@ class EmbeddingSENet(nn.Module):
             feature2_std = torch.sigmoid(feature2_std)
             feature2_std_ext = feature2_std.repeat(1,split_size[0],1,1)
             feature2 = feature2_mean + feature2_std_ext*torch.randn(feature2_mean.size(),device=feature2.get_device())
+            feature2_avg = self.avgpool2(feature2)
 
             feature3 = self.layer3(feature2) #[expansion*256+1,14,14]
             split_size = [self.expansion*256,1]
@@ -134,6 +139,7 @@ class EmbeddingSENet(nn.Module):
             feature3_std = torch.sigmoid(feature3_std)
             feature3_std_ext = feature3_std.repeat(1,split_size[0],1,1)
             feature3 = feature3_mean + feature3_std_ext*torch.randn(feature3_mean.size(),device=feature3.get_device())
+            feature3_avg = self.avgpool3(feature3)
 
             feature4 = self.layer4(feature3) #[expansion*512+1,7,7]
             split_size = [self.expansion*512,1]
@@ -141,7 +147,9 @@ class EmbeddingSENet(nn.Module):
             feature4_std = torch.sigmoid(feature4_std)
             feature4_std_ext = feature4_std.repeat(1,split_size[0],1,1)
             feature4 = feature4_mean + feature4_std_ext*torch.randn(feature4_mean.size(),device=feature4.get_device())
-            x = self.avgpool(feature4)
+            feature4_avg = self.avgpool(feature4)
+
+            std_mean = (torch.mean(feature1_std,1) + torch.mean(feature2_std,1) + torch.mean(feature3_std,1) + torch.mean(feature4_std,1))/4.0
 
         else: #standard version
             feature1 = self.layer1(x) # [expansion*64,56,56]
@@ -149,9 +157,16 @@ class EmbeddingSENet(nn.Module):
             feature3 = self.layer3(feature2) #[expansion*256,14,14]
             feature4 = self.layer4(feature3) #[expansion*512,7,7]
             std_mean = torch.zeros(feature1.size(0),1,device = feature1.get_device())
-            x = self.avgpool(feature4)
+            feature1_avg = self.avgpool1(feature1)
+            feature2_avg = self.avgpool2(feature2)
+            feature3_avg = self.avgpool3(feature3)
+            feature4_avg = self.avgpool4(feature4)
+
+        feature1_avg = feature1_avg.view(feature1_avg.size(0),-1)
+        feature2_avg = feature2_avg.view(feature2_avg.size(0),-1)
+        feature3_avg = feature3_avg.view(feature3_avg.size(0),-1)
+        feature4_avg = feature4_avg.view(feature4_avg.size(0),-1)
 
 
-        x = x.view(x.size(0), -1) #channel: 512*4
 
-        return x
+        return feature1_avg,feature2_avg,feature3_avg,feature4_avg,std_mean

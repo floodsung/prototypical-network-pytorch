@@ -13,7 +13,7 @@ from utils import pprint, set_gpu, ensure_path, Averager, Timer, count_acc, eucl
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--max-epoch', type=int, default=200)
+    parser.add_argument('--max-epoch', type=int, default=1000)
     parser.add_argument('--save-epoch', type=int, default=20)
     parser.add_argument('--shot', type=int, default=1)
     parser.add_argument('--query', type=int, default=15)
@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
 
     trainset = MiniImageNet('train_val')
-    train_sampler = CategoriesSampler(trainset.label, 200,
+    train_sampler = CategoriesSampler(trainset.label, 1000,
                                       args.train_way, args.shot + args.query)
     train_loader = DataLoader(dataset=trainset, batch_sampler=train_sampler,
                               num_workers=8, pin_memory=True)
@@ -65,14 +65,24 @@ if __name__ == '__main__':
             p = args.shot * args.train_way
             data_shot, data_query = data[:p], data[p:]
 
-            proto = model(data_shot)
-            proto = proto.reshape(args.shot, args.train_way, -1).mean(dim=0)
+            proto1,proto2,proto3,proto4,std_mean = model(data_shot)
+            proto1 = proto1.reshape(args.shot, args.train_way, -1).mean(dim=0)
+            proto2 = proto2.reshape(args.shot, args.train_way, -1).mean(dim=0)
+            proto3 = proto3.reshape(args.shot, args.train_way, -1).mean(dim=0)
+            proto4 = proto4.reshape(args.shot, args.train_way, -1).mean(dim=0)
 
             label = torch.arange(args.train_way).repeat(args.query)
             label = label.to(device)
 
-            logits = euclidean_metric(model(data_query), proto)
-            loss = F.cross_entropy(logits, label)
+            query1,query2,query3,query4,_ = model(data_query)
+
+            logits_1 = euclidean_metric(query1, proto1)
+            logits_2 = euclidean_metric(query2, proto2)
+            logits_3 = euclidean_metric(query3, proto3)
+            logits_4 = euclidean_metric(query4, proto4)
+            logits = 0.3*logits_1+0.4*logits_2+0.5*logits_3+logits_4
+
+            loss = F.cross_entropy(logits, label) - 0.05*std_mean
             acc = count_acc(logits, label)
             print('epoch {}, train {}/{}, loss={:.4f} acc={:.4f}'
                   .format(epoch, i, len(train_loader), loss.item(), acc))
