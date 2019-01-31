@@ -82,7 +82,7 @@ if __name__ == '__main__':
             logits_4 = euclidean_metric(query4, proto4)
             logits = 0.3*logits_1+0.4*logits_2+0.5*logits_3+logits_4
 
-            loss = F.cross_entropy(logits, label) - 0.05*std_mean
+            loss = F.cross_entropy(logits, label) - 0.05*torch.mean(std_mean)
             acc = count_acc(logits, label)
             print('epoch {}, train {}/{}, loss={:.4f} acc={:.4f}'
                   .format(epoch, i, len(train_loader), loss.item(), acc))
