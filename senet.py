@@ -147,7 +147,7 @@ class EmbeddingSENet(nn.Module):
             feature4_std = torch.sigmoid(feature4_std)
             feature4_std_ext = feature4_std.repeat(1,split_size[0],1,1)
             feature4 = feature4_mean + feature4_std_ext*torch.randn(feature4_mean.size(),device=feature4.get_device())
-            feature4_avg = self.avgpool(feature4)
+            feature4_avg = self.avgpool4(feature4)
 
             std_mean = (torch.mean(feature1_std,1) + torch.mean(feature2_std,1) + torch.mean(feature3_std,1) + torch.mean(feature4_std,1))/4.0
 
