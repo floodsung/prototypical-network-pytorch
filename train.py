@@ -15,8 +15,8 @@ from utils import pprint, set_gpu, ensure_path, Averager, Timer, count_acc, eucl
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--max-epoch', type=int, default=1000)
-    parser.add_argument('--save-epoch', type=int, default=100)
+    parser.add_argument('--max-epoch', type=int, default=100)
+    parser.add_argument('--save-epoch', type=int, default=10)
     parser.add_argument('--shot', type=int, default=1)
     parser.add_argument('--query', type=int, default=15)
     parser.add_argument('--train-way', type=int, default=30)
@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
 
     trainset = MiniImageNet('train_val')
-    train_sampler = CategoriesSampler(trainset.label, 200,
+    train_sampler = CategoriesSampler(trainset.label, 1000,
                                       args.train_way, args.shot + args.query)
     train_loader = DataLoader(dataset=trainset, batch_sampler=train_sampler,
                               num_workers=8, pin_memory=True)
