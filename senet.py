@@ -149,6 +149,11 @@ class EmbeddingSENet(nn.Module):
             feature4 = feature4_mean + feature4_std_ext*torch.randn(feature4_mean.size(),device=feature4.get_device())
             feature4_avg = self.avgpool4(feature4)
 
+            feature1_std = feature1_std.view(feature1_std.size(0),-1)
+            feature2_std = feature2_std.view(feature2_std.size(0),-1)
+            feature3_std = feature3_std.view(feature3_std.size(0),-1)
+            feature4_std = feature4_std.view(feature4_std.size(0),-1)
+
             std_mean = (torch.mean(feature1_std,1) + torch.mean(feature2_std,1) + torch.mean(feature3_std,1) + torch.mean(feature4_std,1))/4.0
 
         else: #standard version
