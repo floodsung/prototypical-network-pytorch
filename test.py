@@ -51,11 +51,19 @@ if __name__ == '__main__':
         k = args.way * args.shot
         data_shot, data_query = data[:k], data[k:]
 
-        x = model(data_shot)
-        x = x.reshape(args.shot, args.way, -1).mean(dim=0)
-        p = x
+        proto1,proto2,proto3,proto4,std_mean = model(data_shot)
+        proto1 = proto1.reshape(args.shot, args.train_way, -1).mean(dim=0)
+        proto2 = proto2.reshape(args.shot, args.train_way, -1).mean(dim=0)
+        proto3 = proto3.reshape(args.shot, args.train_way, -1).mean(dim=0)
+        proto4 = proto4.reshape(args.shot, args.train_way, -1).mean(dim=0)
 
-        logits = euclidean_metric(model(data_query), p)
+        query1,query2,query3,query4,_ = model(data_query)
+
+        logits_1 = euclidean_metric(query1, proto1)
+        logits_2 = euclidean_metric(query2, proto2)
+        logits_3 = euclidean_metric(query3, proto3)
+        logits_4 = euclidean_metric(query4, proto4)
+        logits = 0.3*logits_1+0.4*logits_2+0.5*logits_3+logits_4
 
         label = torch.arange(args.way).repeat(args.query)
         label = label.to(device)
