@@ -27,9 +27,13 @@ class Convnet(nn.Module):
 
     def forward(self, x):
         feature1 = self.conv1(x)
+        print("feature1:",feature1.size())
         feature2 = self.conv2(feature1)
+        print("feature2:",feature2.size())
         feature3 = self.conv3(feature2)
+        print("feature3:",feature3.size())
         feature4 = self.conv4(feature3)
+        print("feature4:",feature4.size())
         return feature1.view(feature1.size(0), -1),feature2.view(feature2.size(0), -1),feature3.view(feature3.size(0), -1),feature4.view(feature4.size(0), -1)
 
 
