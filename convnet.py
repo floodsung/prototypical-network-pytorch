@@ -20,9 +20,19 @@ class Convnet(nn.Module):
             conv_block(hid_dim, hid_dim),
             conv_block(hid_dim, z_dim),
         )
-        self.out_channels = 1600
+        self.conv1 = conv_block(x_dim, hid_dim)
+        self.conv2 = conv_block(hid_dim, hid_dim)
+        self.conv3 = conv_block(hid_dim, hid_dim)
+        self.conv4 = conv_block(hid_dim,z_dim)
 
     def forward(self, x):
-        x = self.encoder(x)
-        return x.view(x.size(0), -1)
+        feature1 = self.conv1(x)
+        feature2 = self.conv2(feature1)
+        feature3 = self.conv3(feature2)
+        feature4 = self.conv4(feature3)
+        return feature1.view(feature1.size(0), -1),
+               feature2.view(feature2.size(0), -1),
+               feature3.view(feature3.size(0), -1),
+               feature4.view(feature4.size(0), -1),
+
 

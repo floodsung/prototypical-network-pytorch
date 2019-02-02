@@ -70,13 +70,22 @@ if __name__ == '__main__':
             p = args.shot * args.train_way
             data_shot, data_query = data[:p], data[p:]
 
-            proto = model(data_shot)
-            proto = proto.reshape(args.shot, args.train_way, -1).mean(dim=0)
+            proto1,proto2,proto3,proto4 = model(data_shot)
+            proto1 = proto1.reshape(args.shot, args.train_way, -1).mean(dim=0)
+            proto2 = proto2.reshape(args.shot, args.train_way, -1).mean(dim=0)
+            proto3 = proto3.reshape(args.shot, args.train_way, -1).mean(dim=0)
+            proto4 = proto4.reshape(args.shot, args.train_way, -1).mean(dim=0)
 
             label = torch.arange(args.train_way).repeat(args.query)
             label = label.type(torch.cuda.LongTensor)
 
-            logits = euclidean_metric(model(data_query), proto)
+            query1,query2,query3,query4 = model(data_query)
+
+            logits1 = euclidean_metric(query1, proto1)
+            logits2 = euclidean_metric(query2, proto2)
+            logits3 = euclidean_metric(query3, proto3)
+            logits4 = euclidean_metric(query4, proto4)
+            logits = 0.3*logits1+0.4*logits2+0.5*logits3 + logits4
             loss = F.cross_entropy(logits, label)
             acc = count_acc(logits, label)
             print('epoch {}, train {}/{}, loss={:.4f} acc={:.4f}'
@@ -102,13 +111,22 @@ if __name__ == '__main__':
             p = args.shot * args.test_way
             data_shot, data_query = data[:p], data[p:]
 
-            proto = model(data_shot)
-            proto = proto.reshape(args.shot, args.test_way, -1).mean(dim=0)
+            proto1,proto2,proto3,proto4 = model(data_shot)
+            proto1 = proto1.reshape(args.shot, args.test_way, -1).mean(dim=0)
+            proto2 = proto2.reshape(args.shot, args.test_way, -1).mean(dim=0)
+            proto3 = proto3.reshape(args.shot, args.test_way, -1).mean(dim=0)
+            proto4 = proto4.reshape(args.shot, args.test_way, -1).mean(dim=0)
+
 
             label = torch.arange(args.test_way).repeat(args.query)
             label = label.type(torch.cuda.LongTensor)
 
-            logits = euclidean_metric(model(data_query), proto)
+            query1,query2,query3,query4 = model(data_query)
+
+            logits1 = euclidean_metric(query1, proto1)
+            logits2 = euclidean_metric(query2, proto2)
+            logits3 = euclidean_metric(query3, proto3)
+            logits4 = euclidean_metric(query4, proto4)
             loss = F.cross_entropy(logits, label)
             acc = count_acc(logits, label)
 
