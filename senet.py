@@ -126,7 +126,7 @@ class EmbeddingSENet(nn.Module):
             feature1_std = torch.sigmoid(feature1_std)
             feature1_std_ext = feature1_std.repeat(1,split_size[0],1,1)
             feature1 = feature1_mean + feature1_std_ext*torch.randn(feature1_mean.size(),device=feature1.get_device())
-            feature1_avg = self.avgpool1(feature1)
+            feature1_avg = feature1
 
             feature2 = self.layer2(feature1) #[expansion*128+1,28,28]
             split_size = [self.expansion*128,1]
@@ -134,7 +134,7 @@ class EmbeddingSENet(nn.Module):
             feature2_std = torch.sigmoid(feature2_std)
             feature2_std_ext = feature2_std.repeat(1,split_size[0],1,1)
             feature2 = feature2_mean + feature2_std_ext*torch.randn(feature2_mean.size(),device=feature2.get_device())
-            feature2_avg = self.avgpool2(feature2)
+            feature2_avg = feature2
 
             feature3 = self.layer3(feature2) #[expansion*256+1,14,14]
             split_size = [self.expansion*256,1]
@@ -142,7 +142,7 @@ class EmbeddingSENet(nn.Module):
             feature3_std = torch.sigmoid(feature3_std)
             feature3_std_ext = feature3_std.repeat(1,split_size[0],1,1)
             feature3 = feature3_mean + feature3_std_ext*torch.randn(feature3_mean.size(),device=feature3.get_device())
-            feature3_avg = self.avgpool3(feature3)
+            feature3_avg = feature3
 
             feature4 = self.layer4(feature3) #[expansion*512+1,7,7]
             split_size = [self.expansion*512,1]
@@ -150,7 +150,7 @@ class EmbeddingSENet(nn.Module):
             feature4_std = torch.sigmoid(feature4_std)
             feature4_std_ext = feature4_std.repeat(1,split_size[0],1,1)
             feature4 = feature4_mean + feature4_std_ext*torch.randn(feature4_mean.size(),device=feature4.get_device())
-            feature4_avg = self.avgpool4(feature4)
+            feature4_avg = feature4
 
             feature1_std = feature1_std.view(feature1_std.size(0),-1)
             feature2_std = feature2_std.view(feature2_std.size(0),-1)
