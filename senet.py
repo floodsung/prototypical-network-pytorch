@@ -99,7 +99,7 @@ class EmbeddingSENet(nn.Module):
         self.expansion = block.expansion
 
         self.avgpool = nn.AvgPool2d(7, stride=1)
-        self.fc = nn.Linear(512 * block.expansion, num_class)
+        self.fc = nn.Linear(512 * block.expansion, 80)
 
 
     def _make_layer(self, block, planes, blocks, stride=1):
