@@ -2,6 +2,8 @@ import argparse
 
 import torch
 import torch.nn.functional as F
+import torch.nn as nn
+
 from torch.utils.data import DataLoader
 
 from mini_imagenet import MiniImageNet
