@@ -39,6 +39,7 @@ if __name__ == '__main__':
                         num_workers=8, pin_memory=True)
 
     model = EmbeddingSENet(SEBasicBlock,[3, 4, 6, 3],with_variation=True).to(device)
+    model = nn.DataParallel(model,device_ids=[0,1,2,3])
 
     model.load_state_dict(torch.load(args.load))
     model.eval()
