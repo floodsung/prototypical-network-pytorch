@@ -55,10 +55,10 @@ if __name__ == '__main__':
         data_shot, data_query = data[:k], data[k:]
 
         proto1,proto2,proto3,proto4,std_mean = model(data_shot)
-        proto1 = proto1.reshape(args.shot, args.train_way, -1).mean(dim=0)
-        proto2 = proto2.reshape(args.shot, args.train_way, -1).mean(dim=0)
-        proto3 = proto3.reshape(args.shot, args.train_way, -1).mean(dim=0)
-        proto4 = proto4.reshape(args.shot, args.train_way, -1).mean(dim=0)
+        proto1 = proto1.reshape(args.shot, args.way, -1).mean(dim=0)
+        proto2 = proto2.reshape(args.shot, args.way, -1).mean(dim=0)
+        proto3 = proto3.reshape(args.shot, args.way, -1).mean(dim=0)
+        proto4 = proto4.reshape(args.shot, args.way, -1).mean(dim=0)
 
         query1,query2,query3,query4,_ = model(data_query)
 
