@@ -92,9 +92,9 @@ class EmbeddingSENet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        self.avgpool1 = nn.AdaptiveAvgPool2d(2)
-        self.avgpool2 = nn.AdaptiveAvgPool2d(2)
-        self.avgpool3 = nn.AdaptiveAvgPool2d(2)
+        self.avgpool1 = nn.AdaptiveAvgPool2d(5)
+        self.avgpool2 = nn.AdaptiveAvgPool2d(4)
+        self.avgpool3 = nn.AdaptiveAvgPool2d(3)
         self.avgpool4 = nn.AdaptiveAvgPool2d(2)
         self.expansion = block.expansion
 
