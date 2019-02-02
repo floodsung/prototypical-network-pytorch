@@ -127,6 +127,7 @@ if __name__ == '__main__':
             logits2 = euclidean_metric(query2, proto2)
             logits3 = euclidean_metric(query3, proto3)
             logits4 = euclidean_metric(query4, proto4)
+            logits = 0.3*logits1+0.4*logits2+0.5*logits3 + logits4
             loss = F.cross_entropy(logits, label)
             acc = count_acc(logits, label)
 
