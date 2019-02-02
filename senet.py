@@ -98,6 +98,9 @@ class EmbeddingSENet(nn.Module):
         self.avgpool4 = nn.AvgPool2d(7)
         self.expansion = block.expansion
 
+        self.avgpool = nn.AvgPool2d(7, stride=1)
+        self.fc = nn.Linear(512 * block.expansion, num_class)
+
 
     def _make_layer(self, block, planes, blocks, stride=1):
 
@@ -172,6 +175,10 @@ class EmbeddingSENet(nn.Module):
         feature3_avg = feature3_avg.view(feature3_avg.size(0),-1)
         feature4_avg = feature4_avg.view(feature4_avg.size(0),-1)
 
+        x = self.avgpool(feature4)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
 
 
-        return feature1_avg,feature2_avg,feature3_avg,feature4_avg,std_mean
+
+        return feature1_avg,feature2_avg,feature3_avg,feature4_avg,std_mean,x

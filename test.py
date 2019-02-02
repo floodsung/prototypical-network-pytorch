@@ -24,7 +24,7 @@ def mean_confidence_interval(data, confidence=0.95):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', default='0')
-    parser.add_argument('--load', default='./save/proto-1/max-acc.pth')
+    parser.add_argument('--load', default='./save/proto-1/Embedding-80-miniimagenet-1.pkl')
     parser.add_argument('--batch', type=int, default=600)
     parser.add_argument('--way', type=int, default=5)
     parser.add_argument('--shot', type=int, default=1)
@@ -41,7 +41,7 @@ if __name__ == '__main__':
                         num_workers=8, pin_memory=True)
 
     model = EmbeddingSENet(SEBasicBlock,[3, 4, 6, 3],with_variation=True).to(device)
-    model = nn.DataParallel(model,device_ids=[0,1,2,3])
+    model = nn.DataParallel(model,device_ids=[0,1])
 
     model.load_state_dict(torch.load(args.load))
     model.eval()
@@ -54,13 +54,13 @@ if __name__ == '__main__':
         k = args.way * args.shot
         data_shot, data_query = data[:k], data[k:]
 
-        proto1,proto2,proto3,proto4,std_mean = model(data_shot)
+        proto1,proto2,proto3,proto4,std_mean,_ = model(data_shot)
         proto1 = proto1.reshape(args.shot, args.way, -1).mean(dim=0)
         proto2 = proto2.reshape(args.shot, args.way, -1).mean(dim=0)
         proto3 = proto3.reshape(args.shot, args.way, -1).mean(dim=0)
         proto4 = proto4.reshape(args.shot, args.way, -1).mean(dim=0)
 
-        query1,query2,query3,query4,_ = model(data_query)
+        query1,query2,query3,query4,_,_ = model(data_query)
 
         logits_1 = euclidean_metric(query1, proto1)
         logits_2 = euclidean_metric(query2, proto2)
