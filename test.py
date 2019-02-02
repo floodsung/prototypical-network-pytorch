@@ -66,7 +66,7 @@ if __name__ == '__main__':
         logits_2 = euclidean_metric(query2, proto2)
         logits_3 = euclidean_metric(query3, proto3)
         logits_4 = euclidean_metric(query4, proto4)
-        logits = 0.3*logits_1+0.4*logits_2+0.5*logits_3+logits_4
+        logits = logits_4#0.3*logits_1+0.4*logits_2+0.5*logits_3+logits_4
 
         label = torch.arange(args.way).repeat(args.query)
         label = label.to(device)
