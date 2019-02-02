@@ -24,16 +24,16 @@ class Convnet(nn.Module):
         self.conv2 = conv_block(hid_dim, hid_dim)
         self.conv3 = conv_block(hid_dim, hid_dim)
         self.conv4 = conv_block(hid_dim,z_dim)
+        self.avgpool = nn.AdaptiveAvgPool2d(5)
 
     def forward(self, x):
         feature1 = self.conv1(x)
-        print("feature1:",feature1.size())
         feature2 = self.conv2(feature1)
-        print("feature2:",feature2.size())
         feature3 = self.conv3(feature2)
-        print("feature3:",feature3.size())
         feature4 = self.conv4(feature3)
-        print("feature4:",feature4.size())
+        feature1 = self.avgpool(feature1)
+        feature2 = self.avgpool(feature2)
+        feature3 = self.avgpool(feature3)
         return feature1.view(feature1.size(0), -1),feature2.view(feature2.size(0), -1),feature3.view(feature3.size(0), -1),feature4.view(feature4.size(0), -1)
 
 
