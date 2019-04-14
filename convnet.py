@@ -20,9 +20,15 @@ class Convnet(nn.Module):
             conv_block(hid_dim, hid_dim),
             conv_block(hid_dim, z_dim),
         )
-        self.out_channels = 1600
+        self.fc = nn.Linear(1600,512)
+        self.out_channels = 512
 
-    def forward(self, x):
+    def forward(self, x, M):
         x = self.encoder(x)
-        return x.view(x.size(0), -1)
+        x = x.view(x.size(0), -1) #[B,1600]
+
+        x = torch.cat([torch.rand(x.shape[0]*M,1600),x.repeat(1,M).view(-1, 1600)],dim=1)
+
+        x = self.fc(x)
+        return x.view(-1,M,512)
 

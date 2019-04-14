@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from mini_imagenet import MiniImageNet
 from samplers import CategoriesSampler
 from convnet import Convnet
-from utils import pprint, set_gpu, count_acc, Averager, euclidean_metric
+from utils import pprint, set_gpu, count_acc, Averager, wasserstein_metric
 
 
 if __name__ == '__main__':
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         x = x.reshape(args.shot, args.way, -1).mean(dim=0)
         p = x
 
-        logits = euclidean_metric(model(data_query), p)
+        logits = wasserstein_metric(model(data_query), p)
 
         label = torch.arange(args.way).repeat(args.query)
         label = label.type(torch.cuda.LongTensor)

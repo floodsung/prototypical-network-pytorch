@@ -51,6 +51,35 @@ def euclidean_metric(a, b):
     logits = -((a - b)**2).sum(dim=2)
     return logits
 
+def wasserstein_metric(a,b):
+    _,M,D = a.shape
+    n = a.shape[0]
+    m = b.shape[0]
+    a = a.unsqueeze(1).expand(-1,m,-1,-1).view(-1,M,D)
+    b = b.unsqueeze(0).expand(n,-1,-1,-1).view(-1,M,D)
+    logits = -wasserstein_distance(a,b).view(n,m)
+    return logits
+
+
+def wasserstein_distance(X,Y):
+    # shape of a and b: [B,M,512]
+    B,M,D = a.shape
+
+    cost = torch.pairwise_distance(X.unsqueeze(2).expand(-1,-1,M,-1).reshape((-1, D)), 
+                                       Y.unsqueeze(1).expand(-1,M,-1,-1).reshape((-1, D))
+                                      ).reshape((B, M, M))
+    m = -cost/0.1
+        
+    for i in range(10):
+        m = m - m.logsumexp(dim=2, keepdim=True)
+        m = m - m.logsumexp(dim=1, keepdim=True)
+            
+    m = m.softmax(dim=2)
+
+    dist = torch.diagonal(torch.matmul(m.permute(0,2,1), cost), dim1=-2, dim2=-1).sum(dim=1)
+
+    return dist
+
 
 class Timer():
 

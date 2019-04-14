@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from mini_imagenet import MiniImageNet
 from samplers import CategoriesSampler
 from convnet import Convnet
-from utils import pprint, set_gpu, ensure_path, Averager, Timer, count_acc, euclidean_metric
+from utils import pprint, set_gpu, ensure_path, Averager, Timer, count_acc, wasserstein_metric
 
 
 if __name__ == '__main__':
@@ -70,13 +70,14 @@ if __name__ == '__main__':
             p = args.shot * args.train_way
             data_shot, data_query = data[:p], data[p:]
 
-            proto = model(data_shot)
+            proto = model(data_shot) #[B,M,512]
+
             proto = proto.reshape(args.shot, args.train_way, -1).mean(dim=0)
 
             label = torch.arange(args.train_way).repeat(args.query)
             label = label.type(torch.cuda.LongTensor)
 
-            logits = euclidean_metric(model(data_query), proto)
+            logits = wasserstein_distance(model(data_query), proto)
             loss = F.cross_entropy(logits, label)
             acc = count_acc(logits, label)
             print('epoch {}, train {}/{}, loss={:.4f} acc={:.4f}'
